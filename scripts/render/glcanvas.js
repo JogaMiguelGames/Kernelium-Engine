@@ -1,6 +1,6 @@
 var canvas = document.getElementById('gl_map-canvas');
 
-var WebGL = canvas.getContext('experimental-webgl');
+var WebGL = canvas.getContext('webgl') || canvas.getContext("experimental-webgl");
 
 var ColorNames = {
     Red: [
@@ -80,14 +80,14 @@ const ColorHEX = {
     Black:  "#000000FF"
 };
 
-var OBJColor = ColorNames[SelectedColor];
+var OBJColor = ColorNames.White;
 
 const BackgroundColorInput = document.getElementById("Background-Color-Input");
-const OBJColorInput = document.getElementById("OBJ-Color-Input");
+const OBJColorInput        = document.getElementById("OBJ-Color-Input");
 
-const ObjRotInputX = document.getElementById("inspector_obj-rot-x");
-const ObjRotInputY = document.getElementById("inspector_obj-rot-y");
-const ObjRotInputZ = document.getElementById("inspector_obj-rot-z");
+const ObjRotInputX         = document.getElementById("inspector_obj-rot-x");
+const ObjRotInputY         = document.getElementById("inspector_obj-rot-y");
+const ObjRotInputZ         = document.getElementById("inspector_obj-rot-z");
 
 var indices = [
      0,1,2, 0,2,3,
@@ -99,7 +99,7 @@ var indices = [
 ];
 
 let BackgroundColor = HexToGLColor(BackgroundColorInput.value);
-let OBJ_Color = HexToGLColor(OBJColorInput.value);
+let OBJ_Color       = HexToGLColor(OBJColorInput.value);
 
 var HEXOBJColor = [
     OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2],
@@ -112,7 +112,6 @@ var HEXOBJColor = [
 
 var color_buffer = WebGL.createBuffer();
 WebGL.bindBuffer(WebGL.ARRAY_BUFFER, color_buffer);
-WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(OBJColor), WebGL.STATIC_DRAW);
 
 var index_buffer = WebGL.createBuffer();
 WebGL.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, index_buffer);
@@ -191,33 +190,45 @@ function rotateZ(m,a){
     m[1]=c*m[1]+s*m0; m[5]=c*m[5]+s*m4; m[9]=c*m[9]+s*m8;
 }
 
-function UpdateOBJ(){
-    Object.keys(ColorButton).forEach(color => {
-        ColorButton[color].addEventListener("click", () => {
-            OBJColorInput.value = ColorHEX[SelectedColor];
-        });
-    });
+Object.keys(ColorButton).forEach(color => {
+    ColorButton[color].addEventListener("click", () => {
+        SelectedColor = color;
+        OBJColor = ColorNames[SelectedColor];
 
-    OBJColorInput.addEventListener('keydown', function(event) {
-        if (event.key === 'Enter') {
-            HEXColor = true;
-            OBJColor = [
-                OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2],
-                OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2],
-                OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2],
-                OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2],
-                OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2],
-                OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2]
-            ];
-        }
-    });
+        HEXColor = false;
 
-    WebGL.bindBuffer(WebGL.ARRAY_BUFFER, color_buffer);
-    WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(OBJColor), WebGL.STATIC_DRAW);
-}
+        WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(OBJColor), WebGL.STATIC_DRAW);
+    });
+});
+
+Object.keys(ColorButton).forEach(color => {
+    ColorButton[color].addEventListener("click", () => {
+        OBJColorInput.value = ColorHEX[SelectedColor];
+    });
+});
+
+OBJColorInput.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        OBJ_Color = HexToGLColor(OBJColorInput.value);
+
+        HEXColor = true;
+
+        OBJColor = [
+            OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2],
+            OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2],
+            OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2],
+            OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2],
+            OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2],
+            OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2]
+        ];
+
+        WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(OBJColor), WebGL.STATIC_DRAW);
+    }
+});
 
 var vertex_buffer = WebGL.createBuffer();
 WebGL.bindBuffer(WebGL.ARRAY_BUFFER, vertex_buffer);
+
 WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Objects.Cube.Vertices), WebGL.STATIC_DRAW);
 
 var position = WebGL.getAttribLocation(shaderProgram,"position");
@@ -228,6 +239,8 @@ WebGL.bindBuffer(WebGL.ARRAY_BUFFER, color_buffer);
 var color = WebGL.getAttribLocation(shaderProgram,"color");
 WebGL.vertexAttribPointer(color,3,WebGL.FLOAT,false,0,0);
 WebGL.enableVertexAttribArray(color);
+
+WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(OBJColor), WebGL.STATIC_DRAW);
 
 function translate(m, x, y, z){
     m[12] += x;
@@ -387,6 +400,11 @@ resizeAll();
 document.addEventListener("keydown", (event) => {
     if (event.code === "KeyH") {
         StatsEnable = !StatsEnable;
+        if (StatsEnable == true) {
+            document.getElementById("map-tab_stats").className = "map-tab_stats";
+        } else {
+            document.getElementById("map-tab_stats").className = "map-tab_stats-hidden";
+        }
     }
 });
 
@@ -397,9 +415,19 @@ document.addEventListener("keydown", (event) => {
     }
 });
 
+WebGL.viewport(0, 0, canvas.width, canvas.height);
+
+var view_matrix = getViewMatrix();
+
 function animate(){
-    UpdateOBJ();
     updateCameraMovement();
+
+    mov_matrix = [
+        1,0,0,0,
+        0,1,0,0,
+        0,0,1,0,
+        0,0,0,1
+    ];
 
     AnimationRotateNodeX_Degrees = RotationNodeXInput.value;
     AnimationRotateNodeY_Degrees = RotationNodeYInput.value;
@@ -410,7 +438,6 @@ function animate(){
     AnimationRotateNodeZ = degreesToRadians(AnimationRotateNodeZ_Degrees);
 
     BackgroundColor = HexToGLColor(BackgroundColorInput.value);
-    OBJ_Color = HexToGLColor(OBJColorInput.value);
 
     var X_RotAngleDegrees = ObjRotInputX.value;
     var X_RotAngleRadians = degreesToRadians(X_RotAngleDegrees);
@@ -426,13 +453,6 @@ function animate(){
 
     var Z_RotAngleDegrees = ObjRotInputZ.value;
     var Z_RotAngleRadians = degreesToRadians(Z_RotAngleDegrees);
-
-    mov_matrix = [
-        1,0,0,0,
-        0,1,0,0,
-        0,0,1,0,
-        0,0,0,1
-    ];
 
     let ObjectRotationX;
     let ObjectRotationY;
@@ -461,13 +481,7 @@ function animate(){
         ObjectRotationZ = AnimationRotateNodeZ;
     }
 
-    if (StatsEnable == true) {
-        document.getElementById("map-tab_stats").className = "map-tab_stats";
-        console.log("Stats Enabled.")
-    } else {
-        document.getElementById("map-tab_stats").className = "map-tab_stats-hidden";
-        console.log("Stats Disabled.")
-    }
+    view_matrix = getViewMatrix();
 
     document.getElementById("map-tab_stats_camera-position-x").textContent = Number(Camera.Position.X).toFixed(3);
     document.getElementById("map-tab_stats_camera-position-y").textContent = Number(Camera.Position.Y).toFixed(3);
@@ -484,9 +498,8 @@ function animate(){
     window.ObjectRotationY = ObjectRotationY;
     window.ObjectRotationZ = ObjectRotationZ;
 
-    var view_matrix = getViewMatrix();
-
     WebGL.enable(WebGL.DEPTH_TEST);
+    
     WebGL.clearColor(BackgroundColor[0], BackgroundColor[1], BackgroundColor[2], BackgroundColor[3]);
     WebGL.clear(WebGL.COLOR_BUFFER_BIT | WebGL.DEPTH_BUFFER_BIT);
 
@@ -496,11 +509,6 @@ function animate(){
 
     WebGL.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER,index_buffer);
     WebGL.drawElements(WebGL.TRIANGLES,indices.length,WebGL.UNSIGNED_SHORT,0);
-
-    WebGL.bindBuffer(WebGL.ARRAY_BUFFER, vertex_buffer);
-    WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Objects.Cube.Vertices), WebGL.STATIC_DRAW);
-
-    WebGL.viewport(0, 0, canvas.width, canvas.height);
 
     requestAnimationFrame(animate);
 }
