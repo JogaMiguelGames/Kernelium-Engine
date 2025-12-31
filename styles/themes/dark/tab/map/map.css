@@ -28,13 +28,19 @@
 .map-tab_stats {
     position: fixed;
 
-    color: #AAAAAA;
+    color: #AAAAAAFF;
 
     top: 140px;
 
     z-index: 10;
 }
 
-.map-tab_stats span {
-    
+.map-tab_stats-hidden {
+    position: fixed;
+
+    color: #AAAAAA00;
+
+    top: 140px;
+
+    z-index: 10;
 }

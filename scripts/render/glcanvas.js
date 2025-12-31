@@ -341,6 +341,14 @@ var mov_matrix = [
     0,0,0,1
 ];
 
+let StatsEnable = true;
+
+document.addEventListener("keydown", (event) => {
+    if (event.code === "KeyH") {
+        StatsEnable = !StatsEnable;
+    }
+});
+
 function animate(){
     UpdateOBJ();
     updateCameraMovement();
@@ -405,7 +413,13 @@ function animate(){
         ObjectRotationZ = AnimationRotateNodeZ;
     }
 
-    
+    if (StatsEnable == true) {
+        document.getElementById("map-tab_stats").className = "map-tab_stats";
+        console.log("Stats Enabled.")
+    } else {
+        document.getElementById("map-tab_stats").className = "map-tab_stats-hidden";
+        console.log("Stats Disabled.")
+    }
 
     document.getElementById("map-tab_stats_camera-position-x").textContent = Number(Camera.Position.X).toFixed(3);
     document.getElementById("map-tab_stats_camera-position-y").textContent = Number(Camera.Position.Y).toFixed(3);
