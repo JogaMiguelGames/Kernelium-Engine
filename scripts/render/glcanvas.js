@@ -341,11 +341,59 @@ var mov_matrix = [
     0,0,0,1
 ];
 
+const container = document.getElementById("map-tab");
+
+let isFullscreen = false;
 let StatsEnable = true;
+
+function updateFullscreen() {
+    if (isFullscreen) {
+        if (!document.fullscreenElement) {
+            container.requestFullscreen();
+        }
+    } else {
+        if (document.fullscreenElement) {
+            document.exitFullscreen();
+        }
+    }
+}
+
+function resizeAll() {
+    let width, height;
+
+    if (document.fullscreenElement) {
+        width = window.innerWidth;
+        height = window.innerHeight;
+    } else {
+        width = container.clientWidth;
+        height = container.clientHeight;
+    }
+
+    canvas.width = width;
+    canvas.height = height;
+
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+
+    // WebGL
+    // gl.viewport(0, 0, width, height);
+}
+
+document.addEventListener("fullscreenchange", resizeAll);
+window.addEventListener("resize", resizeAll);
+
+resizeAll();
 
 document.addEventListener("keydown", (event) => {
     if (event.code === "KeyH") {
         StatsEnable = !StatsEnable;
+    }
+});
+
+document.addEventListener("keydown", (event) => {
+    if (event.ctrlKey && event.shiftKey && event.code === "KeyF") {
+        isFullscreen = !isFullscreen;
+        updateFullscreen();
     }
 });
 
@@ -451,6 +499,8 @@ function animate(){
 
     WebGL.bindBuffer(WebGL.ARRAY_BUFFER, vertex_buffer);
     WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Objects.Cube.Vertices), WebGL.STATIC_DRAW);
+
+    WebGL.viewport(0, 0, canvas.width, canvas.height);
 
     requestAnimationFrame(animate);
 }
