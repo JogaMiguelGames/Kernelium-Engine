@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <link rel="shortcut icon" href="resources/sprites/icons/Favicon/favicon.svg" type="image/x-icon">
+
+        <link rel="stylesheet" href="styles/themes/dark/main.css">
+
+        <link rel="stylesheet" href="styles/themes/dark/top/MenuBar.css">
+        <link rel="stylesheet" href="styles/themes/dark/top/ToolBar.css">
+        <link rel="stylesheet" href="styles/themes/dark/top/TabBar.css">
+
+        <link rel="stylesheet" href="styles/themes/dark/tab/map/map.css">
+        <link rel="stylesheet" href="styles/themes/dark/tab/map/inspector.css">
+        <link rel="stylesheet" href="styles/themes/dark/tab/map/ui/health.css">
+
+        <link rel="stylesheet" href="styles/themes/dark/inspector/explorer/treeview/icons.css">
+        <link rel="stylesheet" href="styles/themes/dark/inspector/explorer/treeview/buttons.css">
+        <link rel="stylesheet" href="styles/themes/dark/inspector/explorer/treeview/texts.css">
+        <link rel="stylesheet" href="styles/themes/dark/inspector/explorer/treeview/directory.css">
+
+        <link rel="stylesheet" href="styles/themes/dark/inspector/explorer/settings/settings.css">
+
+        <link rel="stylesheet" href="styles/themes/dark/tab/script/script.css">
+
+        <link rel="stylesheet" href="styles/themes/dark/tab/animation/animation.css">
+
+        <link rel="stylesheet" href="styles/themes/dark/tab/animation/nodes/rotation.css">
+
+        <link rel="stylesheet" href="styles/themes/dark/linestyle/linestyle.css">
+
+        <title>Kernelium Engine</title>
+    </head>
+    <body>
+        <div id="Menu-Bar" class="Menu-Bar">
+            <button onclick="Export();">
+                Export
+            </button>
+        </div>
+        <div id="Tool-Bar" class="Tool-Bar">
+            <button id="Run-Button" class="Run-Button" onclick="RunProject();">
+                <img src="resources/sprites/buttons/toolbar/play.svg">
+            </button>
+            <button id="Pause-Button" class="Stop-Button" onclick="PauseProject();">
+                <img src="resources/sprites/buttons/toolbar/pause.svg">
+            </button>
+            <button id="Stop-Button" class="Stop-Button" onclick="StopProject();">
+                <img src="resources/sprites/buttons/toolbar/stop.svg">
+            </button>
+        </div>
+        <div id="Tab-Bar" class="Tab-Bar">
+            <button id="TB-Map">
+                Map
+            </button>
+            <button id="TB-Script">
+                Script
+            </button>
+            <button id="TB-Animation">
+                Animation
+            </button>
+        </div>
+
+        <table id="script-tab" class="script-tab"id="script-tab" class="script-tab">
+            <tr id="Line-1">
+                <td id="Line-1-Content" contenteditable="true"></td>
+            </tr>
+        </table>
+
+        <div id="map-tab" class="map-tab">
+            <canvas width="1000%" height="500%" id="gl_map-canvas" class="gl_map-canvas">
+                Can't Load This WebGL Canvas!
+            </canvas>
+            <div id="map-tab_stats" class="map-tab_stats">
+                <p>Press "H" to hide this.</p>
+
+                <p>== Camera Position ==</p>
+                <label>
+                    | X:
+                    <span id="map-tab_stats_camera-position-x">?</span>
+                    <span> - </span>
+                </label>
+                <label>
+                    Y:
+                    <span id="map-tab_stats_camera-position-y">?</span>
+                    <span> - </span>
+                </label>
+                <label>
+                    Z:
+                    <span id="map-tab_stats_camera-position-z">?</span>
+                    <span>|</span>
+                </label>
+                <p>== Camera Rotation ==</p>
+                <label>
+                    | X:
+                    <span id="map-tab_stats_camera-rotation-x">?</span>
+                    <span> - </span>
+                </label>
+                <label>
+                    Y:
+                    <span id="map-tab_stats_camera-rotation-y">?</span>
+                    <span> - </span>
+                </label>
+                <label>
+                    Z:
+                    <span id="map-tab_stats_camera-rotation-z">?</span>
+                    <span>|</span>
+                </label>
+                <p>== Others ==</p>
+                <label>
+                    | Speed:
+                    <span id="map-tab_stats_camera-speed">?</span>
+                    <span>|</span>
+                </label> <br>
+                <label>
+                    | Sensitivity:
+                    <span id="map-tab_stats_camera-sensitivity">?</span>
+                    <span>|</span>
+                </label>
+            </div>
+            <div id="map-tab_health" class="map-tab_health">
+                <h1 id="map-tab_health-title" class="map-tab_health-title">Health</h1>
+                <h1 id="map-tab_health-text" class="map-tab_health-text">100</h1>
+            </div>
+        </div>
+
+        <div id="animation-tab" class="animation-tab">
+            <button id="animation-tab-add">
+                Add
+            </button>
+        </div>
+
+        <aside class="inspector">
+            <button id="inspector_explorer-button" class="inspector_tab-button" onclick='InspectorTabSelected("explorer");'>Explorer</button>
+            <button id="inspector_object-button"   class="inspector_tab-button" onclick='InspectorTabSelected("obj");'     >Objects</button>
+            <button id="inspector_map-button"      class="inspector_tab-button" onclick='InspectorTabSelected("map");'     >Map</button>
+            <button id="inspector_settings-button" class="inspector_tab-button" onclick='InspectorTabSelected("settings");'>Settings</button>
+
+            <hr color="#444444" width="95%">
+
+            <div id="inspector_explorer-tab" class="inspector-tab-hidden">
+                <div id="inspector_explorer-tree-view" class="inspector_explorer-tree-view">
+                    <button onclick="CreateFile('Untitled', 'text');">
+                        Add
+                    </button>
+                </div>
+            </div>
+
+            <div id="inspector_map-tab" class="inspector-tab-hidden">
+                <label>
+                    Background Color:
+                    <input type="text" id="Background-Color-Input" maxlength="9" value="#000000FF" placeholder="#000000FF" autocomplete="off" style="width: 100px;">
+                </label>
+            </div>
+
+            <div id="inspector_object-tab" class="inspector-tab">
+                <hr color="#444444" width="98%">
+                
+                <h2>Scale</h2>
+
+                <label>
+                    X: 
+                    <input type="number" id="inspector_obj-scale-x" value="1" step="0.1" min="0.1">
+                </label>
+
+                <label>
+                    Y: 
+                    <input type="number" id="inspector_obj-scale-y" value="1" step="0.1" min="0.1">
+                </label>
+
+                <label>
+                    Z: 
+                    <input type="number" id="inspector_obj-scale-z" value="1" step="0.1" min="0.1">
+                </label>
+
+                <h2>Position</h2>
+
+                <label>
+                    X: 
+                    <input type="number" id="inspector_obj-position-x" value="0" step="0.1" min="0.1">
+                </label>
+
+                <label>
+                    Y: 
+                    <input type="number" id="inspector_obj-position-y" value="0" step="0.1" min="0.1">
+                </label>
+
+                <label>
+                    Z: 
+                    <input type="number" id="inspector_obj-position-z" value="0" step="0.1" min="0.1">
+                </label>
+
+                <h2>Rotation</h2>
+
+                <label>
+                    X: 
+                    <input type="number" id="inspector_obj-rot-x" value="0" step="0.1" min="0.1">
+                </label>
+
+                <label>
+                    Y: 
+                    <input type="number" id="inspector_obj-rot-y" value="0" step="0.1" min="0.1">
+                </label>
+
+                <label>
+                    Z: 
+                    <input type="number" id="inspector_obj-rot-z" value="0" step="0.1" min="0.1">
+                </label>
+
+                <hr color="#444444" width="98%">
+
+                <label>
+                    Object Color:
+                    <input type="text" id="OBJ-Color-Input" maxlength="9" value="#FFFFFFFF" placeholder="#FFFFFFFF" autocomplete="off" style="width: 100px;">
+                </label>
+                
+                <div class="inspector_obj-color">
+                    <button id="IOC-Red" class="inspector-color-buttons" style="background-color: #FF0000;"></button>
+                    <button id="IOC-Yellow" class="inspector-color-buttons" style="background-color: #FFFF00;"></button>
+                    <button id="IOC-Green" class="inspector-color-buttons" style="background-color: #00FF00;"></button>
+                    <button id="IOC-Blue" class="inspector-color-buttons" style="background-color: #0000FF;"></button>
+                    <button id="IOC-Purple" class="inspector-color-buttons" style="background-color: #8000FF;"></button>
+                    <button id="IOC-Pink" class="inspector-color-buttons" style="background-color: #FF00FF;"></button>
+                    <button id="IOC-White" class="inspector-color-buttons" style="background-color: #FFFFFF;"></button>
+                    <button id="IOC-Black" class="inspector-color-buttons" style="background-color: #000000;"></button>
+                </div>
+            </div>
+            <div id="inspector_settings-tab" class="inspector-tab-hidden">
+                <div class="inspector_settings-tab">
+                    <h1>Camera</h1>
+
+                    <h2>Position</h2>
+
+                    <label>
+                        X: 
+                        <input type="number" id="inspector_settings_camera-position-x" value="0" step="0.1" min="0.1">
+                    </label>
+
+                    <label>
+                        Y: 
+                        <input type="number" id="inspector_settings_camera-position-y" value="0" step="0.1" min="0.1">
+                    </label>
+
+                    <label>
+                        Z: 
+                        <input type="number" id="inspector_settings_camera-position-z" value="6" step="0.1" min="0.1">
+                    </label>
+
+                    <hr color="#444444" width="98%">
+
+                    <h1>Player</h1>
+
+                    <h2>Health</h2>
+
+                    <label>
+                        Max Health: 
+                        <input type="number" id="inspector_settings-max_health" maxlength="8" value="100" placeholder="100" autocomplete="off" step="1" min="1">
+                    </label>
+
+                    <hr color="#444444" width="98%">
+                </div>
+            </div>
+        </aside>
+
+        <input type="file" id="file-input">
+
+        <script src="scripts/main.js"></script>
+
+        <script src="scripts/project/project.js"></script>
+
+        <script src="scripts/ui/topbar.js"></script>
+        <script src="scripts/ui/inspector/color.js"></script>
+        <script src="scripts/ui/inspector/explorer/explorer.js"></script>
+
+        <script src="scripts/tab/inspector.js"></script>
+
+        <script src="scripts/tab/script/script.js"></script>
+
+        <script src="scripts/tab/animation/animation.js"></script>
+
+        <script src="scripts/objects/objects.js"></script>
+
+        <script src="scripts/render/glcolor.js"></script>
+        <script src="scripts/render/glcanvas.js"></script>
+
+        <script src="scripts/file/save.js"></script>
+        <script src="scripts/file/load.js"></script>
+        <script src="scripts/file/export.js"></script>
+    </body>
+</html>
