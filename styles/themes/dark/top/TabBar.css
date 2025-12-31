@@ -1,0 +1,49 @@
+.Tab-Bar {
+    position: fixed;
+
+    top: 100px;
+    left: 0;
+
+    right: 280px;
+    height: 30px;
+
+    width: 100%;
+    
+    background: #222222;
+
+    display: flex;
+
+    align-items: center;
+
+    padding: 0 8px;
+
+    gap: 8px;
+
+    z-index: 1200;
+
+    user-select: none;
+
+    box-sizing: border-box;
+
+    border-bottom: 2px solid #000000;
+}
+
+.Tab-Bar button {
+    background-color: #555555;
+    color: #FFFFFF;
+
+    bottom: 0;
+    left: 0;
+
+    margin-left: 0%;
+
+    width: 100px;
+    height: 30px;
+
+    border-top: 0px solid #0080FF;
+
+    border: 2pxpx solid #555555;
+
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}

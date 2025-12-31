@@ -1,0 +1,74 @@
+.animation-rotation-node {
+    background-color: #555555;
+
+    position: absolute;
+
+    top: 50%;
+    left: 50%;
+
+    width: 500px;
+    height: 200px;
+
+    border: 2px solid #000000;
+    border-radius: 10px;
+}
+
+.animation-rotation-node-top {
+    background-color: #00FF00;
+    color: #FFFFFF;
+
+    position: absolute;
+
+    margin: 0;
+
+    width: 500px;
+    height: 30px;
+
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.animation-rotation-node-top h1 {
+
+    margin-top: 0;
+}
+
+.animation-rotation-node label {
+    color: #FFFFFF;
+
+    margin-top: 100px;
+    margin-left: 20px;
+
+    text-align: center;
+
+    font-size: 22px;
+}
+
+.animation-rotation-node input {
+    background-color: #444444;
+
+    margin-left: 20px;
+
+    width: 50px;
+    height: 20px;
+
+    text-align: center;
+
+    border: 2px solid #000000;
+    border-radius: 5px;
+}
+
+.animation-rotation-node button {
+    background-color: #FF0000;
+
+    position: absolute;
+
+    top: 73.5%;
+    left: 90%;
+
+    width: 40px;
+    height: 40px;
+
+    border: 2px solid #000000;
+    border-radius: 5px;
+}

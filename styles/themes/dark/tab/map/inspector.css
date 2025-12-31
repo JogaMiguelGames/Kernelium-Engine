@@ -1,0 +1,108 @@
+.inspector {
+    position: fixed;
+    top: 13.5vh;
+    right: 0;
+    width: 20%;
+    height: 84vh;
+    background-color: #222222;
+    color: #FFFFFF;
+    padding: 15px;
+    overflow-y: auto;
+    border-left: 1px solid #444444;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    user-select: none;
+    text-align: center;
+    z-index: 5;
+}
+
+.inspector input {
+    background-color: #444444;
+    color: #FFFFFF;
+
+    width: 80px;
+
+    border: 2px solid #000000;
+    border-radius: 5px;
+}
+
+.inspector-tab {
+    background-color: #555555;
+
+    align-items: center;
+
+    border: 1px solid #000000;
+    border-radius: 5px;
+}
+
+.inspector_tab-button {
+    background-color: #555555;
+
+    border: 2px solid #000000;
+    border-radius: 5px;
+}
+
+.inspector-tab input {
+    background-color: #555555;
+
+    width: 50px;
+    height: 20px;
+
+    align-items: center;
+
+    border: 1px solid #000000;
+    border-radius: 3px;
+}
+
+.inspector-tab-hidden {
+    background-color: #555555;
+
+    align-items: center;
+
+    display: none;
+
+    border: 1px solid #000000;
+    border-radius: 5px;
+}
+
+.inspector h2 {
+    margin: 0;
+}
+
+.inspector_obj-color {
+    background-color: #444444;
+
+    border-radius: 2px;
+}
+
+.inspector-color-buttons {
+    background-color: #FFFFFF;
+
+    width: 25px;
+    height: 25px;
+
+    border: 2px solid #000000;
+    border-radius: 50px;
+}
+
+.inspector_explorer-tree-view {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    background-color: #222222;
+    height: 500px;
+    border: 2px solid #000000;
+    border-radius: 2px;
+}
+
+.inspector_explorer-tree-view-file {
+    position: relative !important;
+
+    margin-top: -50px;
+
+    top: 15px;
+
+    left: 80px;
+}

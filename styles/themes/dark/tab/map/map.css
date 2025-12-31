@@ -1,0 +1,40 @@
+.map-tab {
+    position: fixed;
+
+    width: 87%;
+    height: 87%;
+
+    bottom: 0;
+    left: 0;
+
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.map-tab button {
+    position: fixed;
+
+    z-index: 5;
+}
+
+.gl_map-canvas {
+    position: fixed;
+    width: 87%;
+    height: 87%;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+}
+
+.map-tab_stats {
+    position: fixed;
+
+    color: #AAAAAA;
+
+    top: 140px;
+
+    z-index: 10;
+}
+
+.map-tab_stats span {
+    
+}

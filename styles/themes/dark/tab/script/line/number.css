@@ -1,0 +1,14 @@
+.line-number {
+    box-sizing: border-box;
+    width: 31px;
+    background-color: light-dark(rgb(240, 240, 240), rgb(60, 60, 60));
+    user-select: none;
+    text-align: right;
+    color: light-dark(rgb(148, 132, 132), rgb(128, 128, 128));
+    word-break: normal;
+    font-size: 9px;
+    font-family: Helvetica;
+    padding: 0px 4px !important;
+    border-right: 1px solid rgb(187, 187, 187) !important;
+    white-space: nowrap;
+}

@@ -1,0 +1,19 @@
+.Script_Type-Parentheses {
+    color: #FFFF00;
+}
+
+.Script_Type-Console {
+    color: #00DCF0;
+}
+
+.Script_Type-Console-Write {
+    color: #FFFFFF;
+}
+
+.Script_Type-Console-Warning {
+    color: #FF8000;
+}
+
+.Script_Type-Console-Error {
+    color: #FF0000;
+}

@@ -1,0 +1,25 @@
+.script-tab {
+    background-color: #555555;
+
+    position: fixed;
+
+    top: 130px;
+    left: 0;
+
+    right: 280px;
+    
+    height: 85%;
+
+    width: 100%;
+
+    font-size: 20px;
+
+    border: 5px solid #000000;
+    border-radius: 0;
+}
+
+.script-tab:focus {
+    outline: none;
+
+    font-size: 20px;
+}

@@ -1,0 +1,16 @@
+.inspector_explorer-tree-view img {
+    position: relative !important;
+
+    width: 32px;
+    height: 32px;
+}
+
+.inspector_explorer-tree-view-project-folder {
+    position: absolute !important;
+
+    margin-top: 0px !important;
+    margin-left: 0px !important;
+
+    width: 64px !important;
+    height: 64px !important;
+}

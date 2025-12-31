@@ -1,0 +1,15 @@
+.inspector_explorer-tree-view button {
+    background-color: #0080FF;
+
+    position: fixed;
+
+    right: 20px;
+
+    width: 100px;
+    height: 30px;
+
+    font-size: 20px;
+
+    border: 2px solid #000000;
+    border-radius: 5px;
+}

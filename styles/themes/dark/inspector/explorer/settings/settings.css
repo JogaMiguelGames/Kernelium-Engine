@@ -1,0 +1,15 @@
+.inspector_settings-tab label {
+    width: 100px;
+}
+
+.inspector_settings-tab input {
+    width: 50px;
+
+    border: 1px solid #000000;
+
+    text-align: center;
+}
+
+#inspector_settings-max_health {
+    width: 100px !important;
+}
