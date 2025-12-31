@@ -226,6 +226,14 @@ OBJColorInput.addEventListener('keydown', function(event) {
     }
 });
 
+BackgroundColorInput.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter') {
+        BackgroundColor = HexToGLColor(BackgroundColorInput.value);
+
+        WebGL.clearColor(BackgroundColor[0], BackgroundColor[1], BackgroundColor[2], BackgroundColor[3]);
+    }
+});
+
 var vertex_buffer = WebGL.createBuffer();
 WebGL.bindBuffer(WebGL.ARRAY_BUFFER, vertex_buffer);
 
@@ -241,6 +249,8 @@ WebGL.vertexAttribPointer(color,3,WebGL.FLOAT,false,0,0);
 WebGL.enableVertexAttribArray(color);
 
 WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(OBJColor), WebGL.STATIC_DRAW);
+
+WebGL.clearColor(0.0, 0.0, 0.0, 1.0);
 
 function translate(m, x, y, z){
     m[12] += x;
@@ -419,6 +429,25 @@ WebGL.viewport(0, 0, canvas.width, canvas.height);
 
 var view_matrix = getViewMatrix();
 
+var X_RotAngleDegrees = ObjRotInputX.value;
+var X_RotAngleRadians = degreesToRadians(X_RotAngleDegrees);
+
+window.XRAD = X_RotAngleDegrees;
+window.XRAR = X_RotAngleRadians;
+
+var Y_RotAngleDegrees = ObjRotInputY.value;
+var Y_RotAngleRadians = degreesToRadians(Y_RotAngleDegrees);
+
+window.YRAD = Y_RotAngleDegrees;
+window.YRAR = Y_RotAngleRadians;
+
+var Z_RotAngleDegrees = ObjRotInputZ.value;
+var Z_RotAngleRadians = degreesToRadians(Z_RotAngleDegrees);
+
+let ObjectRotationX;
+let ObjectRotationY;
+let ObjectRotationZ;
+
 function animate(){
     updateCameraMovement();
 
@@ -437,26 +466,20 @@ function animate(){
     AnimationRotateNodeY = degreesToRadians(AnimationRotateNodeY_Degrees);
     AnimationRotateNodeZ = degreesToRadians(AnimationRotateNodeZ_Degrees);
 
-    BackgroundColor = HexToGLColor(BackgroundColorInput.value);
-
-    var X_RotAngleDegrees = ObjRotInputX.value;
-    var X_RotAngleRadians = degreesToRadians(X_RotAngleDegrees);
+    X_RotAngleDegrees = ObjRotInputX.value;
+    X_RotAngleRadians = degreesToRadians(X_RotAngleDegrees);
 
     window.XRAD = X_RotAngleDegrees;
     window.XRAR = X_RotAngleRadians;
 
-    var Y_RotAngleDegrees = ObjRotInputY.value;
-    var Y_RotAngleRadians = degreesToRadians(Y_RotAngleDegrees);
+    Y_RotAngleDegrees = ObjRotInputY.value;
+    Y_RotAngleRadians = degreesToRadians(Y_RotAngleDegrees);
 
     window.YRAD = Y_RotAngleDegrees;
     window.YRAR = Y_RotAngleRadians;
 
-    var Z_RotAngleDegrees = ObjRotInputZ.value;
-    var Z_RotAngleRadians = degreesToRadians(Z_RotAngleDegrees);
-
-    let ObjectRotationX;
-    let ObjectRotationY;
-    let ObjectRotationZ;
+    Z_RotAngleDegrees = ObjRotInputZ.value;
+    Z_RotAngleRadians = degreesToRadians(Z_RotAngleDegrees);
 
     window.ZRAD = Z_RotAngleDegrees;
     window.ZRAR = Z_RotAngleRadians;
@@ -500,7 +523,6 @@ function animate(){
 
     WebGL.enable(WebGL.DEPTH_TEST);
     
-    WebGL.clearColor(BackgroundColor[0], BackgroundColor[1], BackgroundColor[2], BackgroundColor[3]);
     WebGL.clear(WebGL.COLOR_BUFFER_BIT | WebGL.DEPTH_BUFFER_BIT);
 
     WebGL.uniformMatrix4fv(Pmatrix,false,proj_matrix);
