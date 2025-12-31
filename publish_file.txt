@@ -1,5 +1,0 @@
-This is a test to see if Git is actually publishing, that's why I created this file. It might become lost media. If you're reading this and it was lost media before, know that this is a test to see if my Git publishing bat file is working :)
-
-Or maybe it will never be a Lost Media, who knows?
-
-- Garry (JogaMiguelGames)
