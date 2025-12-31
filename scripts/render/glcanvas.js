@@ -1,6 +1,6 @@
 var canvas = document.getElementById('gl_map-canvas');
 
-var WebGL = canvas.getContext('webgl') || canvas.getContext("experimental-webgl");
+var WebGL = canvas.getContext('webgl2') || canvas.getContext("webgl");
 
 var ColorNames = {
     Red: [
@@ -44,12 +44,12 @@ var ColorNames = {
         0.5,0,1, 0.5,0,1, 0.5,0,1, 0.5,0,1
     ],
     Pink: [
-        1,0.4,0.7, 1,0.4,0.7, 1,0.4,0.7, 1,0.4,0.7,
-        1,0.4,0.7, 1,0.4,0.7, 1,0.4,0.7, 1,0.4,0.7,
-        1,0.4,0.7, 1,0.4,0.7, 1,0.4,0.7, 1,0.4,0.7,
-        1,0.4,0.7, 1,0.4,0.7, 1,0.4,0.7, 1,0.4,0.7,
-        1,0.4,0.7, 1,0.4,0.7, 1,0.4,0.7, 1,0.4,0.7,
-        1,0.4,0.7, 1,0.4,0.7, 1,0.4,0.7, 1,0.4,0.7
+        1, 0.4, 0.7, 1, 0.4, 0.7, 1, 0.4, 0.7, 1, 0.4, 0.7,
+        1, 0.4, 0.7, 1, 0.4, 0.7, 1, 0.4, 0.7, 1, 0.4, 0.7,
+        1, 0.4, 0.7, 1, 0.4, 0.7, 1, 0.4, 0.7, 1, 0.4, 0.7,
+        1, 0.4, 0.7, 1, 0.4, 0.7, 1, 0.4, 0.7, 1, 0.4, 0.7,
+        1, 0.4, 0.7, 1, 0.4, 0.7, 1, 0.4, 0.7, 1, 0.4, 0.7,
+        1, 0.4, 0.7, 1, 0.4, 0.7, 1, 0.4, 0.7, 1, 0.4, 0.7
     ],
     White: [
         1,1,1, 1,1,1, 1,1,1, 1,1,1,
@@ -244,7 +244,9 @@ WebGL.vertexAttribPointer(position,3,WebGL.FLOAT,false,0,0);
 WebGL.enableVertexAttribArray(position);
 
 WebGL.bindBuffer(WebGL.ARRAY_BUFFER, color_buffer);
+
 var color = WebGL.getAttribLocation(shaderProgram,"color");
+
 WebGL.vertexAttribPointer(color,3,WebGL.FLOAT,false,0,0);
 WebGL.enableVertexAttribArray(color);
 
@@ -408,7 +410,7 @@ window.addEventListener("resize", resizeAll);
 resizeAll();
 
 document.addEventListener("keydown", (event) => {
-    if (event.code === "KeyH") {
+    if (event.ctrlKey && event.shiftKey && event.code === "KeyH") {
         StatsEnable = !StatsEnable;
         if (StatsEnable == true) {
             document.getElementById("map-tab_stats").className = "map-tab_stats";
@@ -522,15 +524,19 @@ function animate(){
     window.ObjectRotationZ = ObjectRotationZ;
 
     WebGL.enable(WebGL.DEPTH_TEST);
+
+    WebGL.bindBuffer(WebGL.ARRAY_BUFFER, vertex_buffer);
+
+    WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Objects.Cube.Vertices), WebGL.STATIC_DRAW);
     
     WebGL.clear(WebGL.COLOR_BUFFER_BIT | WebGL.DEPTH_BUFFER_BIT);
 
-    WebGL.uniformMatrix4fv(Pmatrix,false,proj_matrix);
-    WebGL.uniformMatrix4fv(Vmatrix,false,view_matrix);
-    WebGL.uniformMatrix4fv(Mmatrix,false,mov_matrix);
+    WebGL.uniformMatrix4fv(Pmatrix, false, proj_matrix);
+    WebGL.uniformMatrix4fv(Vmatrix, false, view_matrix);
+    WebGL.uniformMatrix4fv(Mmatrix, false, mov_matrix);
 
-    WebGL.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER,index_buffer);
-    WebGL.drawElements(WebGL.TRIANGLES,indices.length,WebGL.UNSIGNED_SHORT,0);
+    WebGL.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, index_buffer);
+    WebGL.drawElements(WebGL.TRIANGLES,indices.length, WebGL.UNSIGNED_SHORT, 0);
 
     requestAnimationFrame(animate);
 }

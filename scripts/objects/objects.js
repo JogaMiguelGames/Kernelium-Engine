@@ -383,9 +383,6 @@ function OBJPosition(X, Y, Z) {
     OBJPositionZ(Z);
 }
 
-console.log(Objects.Cube.Faces.Top.Y)
-console.log(Objects.Cube.Faces.Down.Y)
-
 Object.keys(Inputs).forEach(scale => {
     Inputs[scale].addEventListener('keydown', function(event) {
         OBJScale(Inputs.SX.value, Inputs.SY.value, Inputs.SZ.value);
