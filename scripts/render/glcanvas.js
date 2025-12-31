@@ -1,6 +1,6 @@
 var canvas = document.getElementById('gl_map-canvas');
 
-var WebGL = canvas.getContext('webgl2') || canvas.getContext("webgl");
+var WebGL = canvas.getContext('webgl') || canvas.getContext("webgl-experimental");
 
 var ColorNames = {
     Red: [
