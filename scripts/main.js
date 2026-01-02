@@ -104,9 +104,9 @@ function RunProject() {
     Camera.Position.Y = elements.inspector.tabs.settings.camera.inputs.position.y.value;
     Camera.Position.Z = elements.inspector.tabs.settings.camera.inputs.position.z.value;
 
-    Camera.Rotation.X = 0;
-    Camera.Rotation.Y = 0;
-    Camera.Rotation.Z = 0;
+    Camera.Rotation.X = 0.0;
+    Camera.Rotation.Y = 0.0;
+    Camera.Rotation.Z = 0.0;
 
     Camera.Settings.Speed = 0.15;
     Camera.Settings.Sensitivity = 0.002;
