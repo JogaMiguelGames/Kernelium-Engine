@@ -264,6 +264,7 @@ var keys = {};
 
 function normalize(v){
     var l = Math.hypot(v[0], v[1], v[2]);
+    if (l === 0) return [0,0,0];
     return [v[0]/l, v[1]/l, v[2]/l];
 }
 
@@ -292,7 +293,11 @@ window.addEventListener("keyup", e=>keys[e.key.toLowerCase()] = false);
 
 function updateCameraMovement(){
     var f = getCameraForward();
-    var r = normalize(cross(f, [0,1,0]));
+    var r = cross(f, [0,1,0]);
+    if (r[0] === 0 && r[1] === 0 && r[2] === 0) {
+        r = [1,0,0];
+    }
+    r = normalize(r);
 
     if (MapTabEnabled == true) {
         if(keys["w"]){
@@ -428,8 +433,6 @@ document.addEventListener("keydown", (event) => {
 });
 
 WebGL.viewport(0, 0, canvas.width, canvas.height);
-
-var view_matrix = getViewMatrix();
 
 var X_RotAngleDegrees = ObjRotInputX.value;
 var X_RotAngleRadians = degreesToRadians(X_RotAngleDegrees);

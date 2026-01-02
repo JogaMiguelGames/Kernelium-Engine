@@ -100,9 +100,9 @@ function RunProject() {
     LastCamera.Settings.Sensitivity = Camera.Settings.Sensitivity;
 
     RunScript();
-    Camera.Position.X = elements.inspector.tabs.settings.camera.inputs.position.x.value;
-    Camera.Position.Y = elements.inspector.tabs.settings.camera.inputs.position.y.value;
-    Camera.Position.Z = elements.inspector.tabs.settings.camera.inputs.position.z.value;
+    Camera.Position.X = Number(elements.inspector.tabs.settings.camera.inputs.position.x.value) || 0;
+    Camera.Position.Y = Number(elements.inspector.tabs.settings.camera.inputs.position.y.value) || 0;
+    Camera.Position.Z = Number(elements.inspector.tabs.settings.camera.inputs.position.z.value) || 0;
 
     Camera.Rotation.X = 0.0;
     Camera.Rotation.Y = 0.0;
