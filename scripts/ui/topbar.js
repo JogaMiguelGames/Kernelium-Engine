@@ -12,8 +12,6 @@ ScriptWindow.style.display = 'none';
 
 AnimationWindow.style.display = 'none';
 
-let MapTabEnabled = true;
-
 MapTab.addEventListener('click', (e) => {
     MapTab.style.borderTop = '2px solid #0080FF';
     ScriptTab.style.borderTop = '0px solid #0080FF';

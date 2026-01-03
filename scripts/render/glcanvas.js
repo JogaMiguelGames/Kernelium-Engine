@@ -1,6 +1,14 @@
-var canvas = document.getElementById('gl_map-canvas');
+var canvas =  document.getElementById('gl_map-canvas');
 
-var WebGL = canvas.getContext('webgl') || canvas.getContext("webgl-experimental");
+var WebGL  =  canvas.getContext('webgl');
+
+if (!WebGL) {
+    console.error("WebGL is not supported on this browser or device!");
+
+    alert("WebGL is not supported on this browser or device!");
+}
+
+var HaveTexture = false;
 
 var ColorNames = {
     Red: [
@@ -98,6 +106,16 @@ var indices = [
     20,21,22, 20,22,23
 ];
 
+const DrawAxisLineXVertices = new Float32Array([
+     100, 0, 0,
+    -100, 0, 0
+]);
+
+const DrawAxisLineZVertices = new Float32Array([
+     0,  0,  100,
+     0,  0, -100
+]);
+
 let BackgroundColor = HexToGLColor(BackgroundColorInput.value);
 let OBJ_Color       = HexToGLColor(OBJColorInput.value);
 
@@ -112,6 +130,11 @@ var HEXOBJColor = [
 
 var color_buffer = WebGL.createBuffer();
 WebGL.bindBuffer(WebGL.ARRAY_BUFFER, color_buffer);
+WebGL.bufferData(
+    WebGL.ARRAY_BUFFER,
+    new Float32Array(OBJColor),
+    WebGL.STATIC_DRAW
+);
 
 var index_buffer = WebGL.createBuffer();
 WebGL.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, index_buffer);
@@ -120,20 +143,30 @@ WebGL.bufferData(WebGL.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), WebGL.STA
 var vertCode =
     'attribute vec3 position;' +
     'attribute vec3 color;' +
+    'attribute vec2 uv;' +
+    'varying vec3 vColor;' +
+    'varying vec2 vUV;' +
     'uniform mat4 Pmatrix;' +
     'uniform mat4 Vmatrix;' +
     'uniform mat4 Mmatrix;' +
-    'varying vec3 vColor;' +
-    'void main(void){' +
-    'gl_Position = Pmatrix * Vmatrix * Mmatrix * vec4(position,1.);' +
+    'void main() {' +
     'vColor = color;' +
+    'vUV = uv;' +
+    'gl_Position = Pmatrix * Vmatrix * Mmatrix * vec4(position, 1.0);' +
     '}';
 
 var fragCode =
     'precision mediump float;' +
     'varying vec3 vColor;' +
-    'void main(void){' +
-    'gl_FragColor = vec4(vColor,1.);' +
+    'varying vec2 vUV;' +
+    'uniform bool HaveTexture;' +
+    'uniform sampler2D uTexture;' +
+    'void main() {' +
+    'if (HaveTexture) {' +
+    'gl_FragColor = texture2D(uTexture, vUV);' +
+    '} else {' +
+    'gl_FragColor = vec4(vColor, 1.0);' +
+    '}' +
     '}';
 
 var vertShader = WebGL.createShader(WebGL.VERTEX_SHADER);
@@ -149,6 +182,9 @@ WebGL.attachShader(shaderProgram, vertShader);
 WebGL.attachShader(shaderProgram, fragShader);
 WebGL.linkProgram(shaderProgram);
 WebGL.useProgram(shaderProgram);
+
+const haveTextureLoc = WebGL.getUniformLocation(shaderProgram, "HaveTexture");
+const textureLoc = WebGL.getUniformLocation(shaderProgram, "uTexture");
 
 var Pmatrix = WebGL.getUniformLocation(shaderProgram, "Pmatrix");
 var Vmatrix = WebGL.getUniformLocation(shaderProgram, "Vmatrix");
@@ -197,6 +233,7 @@ Object.keys(ColorButton).forEach(color => {
 
         HEXColor = false;
 
+        WebGL.bindBuffer(WebGL.ARRAY_BUFFER, color_buffer);
         WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(OBJColor), WebGL.STATIC_DRAW);
     });
 });
@@ -222,12 +259,14 @@ OBJColorInput.addEventListener('keydown', function(event) {
             OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2], OBJ_Color[0], OBJ_Color[1], OBJ_Color[2]
         ];
 
+        WebGL.bindBuffer(WebGL.ARRAY_BUFFER, color_buffer);
         WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(OBJColor), WebGL.STATIC_DRAW);
     }
 });
 
 BackgroundColorInput.addEventListener('keydown', function(event) {
     if (event.key === 'Enter') {
+
         BackgroundColor = HexToGLColor(BackgroundColorInput.value);
 
         WebGL.clearColor(BackgroundColor[0], BackgroundColor[1], BackgroundColor[2], BackgroundColor[3]);
@@ -239,18 +278,110 @@ WebGL.bindBuffer(WebGL.ARRAY_BUFFER, vertex_buffer);
 
 WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Objects.Cube.Vertices), WebGL.STATIC_DRAW);
 
-var position = WebGL.getAttribLocation(shaderProgram,"position");
-WebGL.vertexAttribPointer(position,3,WebGL.FLOAT,false,0,0);
-WebGL.enableVertexAttribArray(position);
+var color = WebGL.getAttribLocation(shaderProgram, "color");
+var uv    = WebGL.getAttribLocation(shaderProgram, "uv");
 
-WebGL.bindBuffer(WebGL.ARRAY_BUFFER, color_buffer);
+var uv_buffer = WebGL.createBuffer();
+WebGL.bindBuffer(WebGL.ARRAY_BUFFER, uv_buffer);
+WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Objects.Cube.UV), WebGL.STATIC_DRAW);
+
+var position = WebGL.getAttribLocation(shaderProgram,"position");
 
 var color = WebGL.getAttribLocation(shaderProgram,"color");
 
-WebGL.vertexAttribPointer(color,3,WebGL.FLOAT,false,0,0);
-WebGL.enableVertexAttribArray(color);
+function drawCube() {
+    WebGL.bindBuffer(WebGL.ARRAY_BUFFER, vertex_buffer);
+    WebGL.vertexAttribPointer(position, 3, WebGL.FLOAT, false, 0, 0);
+    WebGL.enableVertexAttribArray(position);
 
-WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(OBJColor), WebGL.STATIC_DRAW);
+    WebGL.bindBuffer(WebGL.ARRAY_BUFFER, color_buffer);
+    WebGL.vertexAttribPointer(color, 3, WebGL.FLOAT, false, 0, 0);
+    WebGL.enableVertexAttribArray(color);
+
+    WebGL.bindBuffer(WebGL.ARRAY_BUFFER, uv_buffer);
+    WebGL.vertexAttribPointer(uv, 2, WebGL.FLOAT, false, 0, 0);
+    WebGL.enableVertexAttribArray(uv);
+
+    WebGL.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, index_buffer);
+
+    WebGL.drawElements(WebGL.TRIANGLES, indices.length, WebGL.UNSIGNED_SHORT, 0);
+}
+
+const DrawAxisLineXVertexBuffer = WebGL.createBuffer();
+WebGL.bindBuffer(WebGL.ARRAY_BUFFER, DrawAxisLineXVertexBuffer);
+WebGL.bufferData(WebGL.ARRAY_BUFFER, DrawAxisLineXVertices, WebGL.STATIC_DRAW);
+
+const DrawAxisLineZVertexBuffer = WebGL.createBuffer();
+WebGL.bindBuffer(WebGL.ARRAY_BUFFER, DrawAxisLineZVertexBuffer);
+WebGL.bufferData(WebGL.ARRAY_BUFFER, DrawAxisLineZVertices, WebGL.STATIC_DRAW);
+
+let DrawAxisLineXColors = new Float32Array([
+    1.0, 0.0, 0.0,
+    1.0, 0.0, 0.0
+]);
+
+let DrawAxisLineZColors = new Float32Array([
+    0.0, 0.0, 1.0,
+    0.0, 0.0, 1.0
+]);
+
+const DrawAxisLineXColorBuffer = WebGL.createBuffer();
+WebGL.bindBuffer(WebGL.ARRAY_BUFFER, DrawAxisLineXColorBuffer);
+WebGL.bufferData(WebGL.ARRAY_BUFFER, DrawAxisLineXColors, WebGL.STATIC_DRAW);
+
+const DrawAxisLineZColorBuffer = WebGL.createBuffer();
+WebGL.bindBuffer(WebGL.ARRAY_BUFFER, DrawAxisLineZColorBuffer);
+WebGL.bufferData(WebGL.ARRAY_BUFFER, DrawAxisLineZColors, WebGL.STATIC_DRAW);
+
+function DrawAxisLineX(Color) {
+    let LineColor = HexToGLColor(Color);
+    DrawAxisLineXColors = new Float32Array ([
+        LineColor[0], LineColor[1], LineColor[2],
+        LineColor[0], LineColor[1], LineColor[2]
+    ]);
+
+    WebGL.bindBuffer(WebGL.ARRAY_BUFFER, DrawAxisLineXColorBuffer);
+    WebGL.bufferData(WebGL.ARRAY_BUFFER, DrawAxisLineXColors, WebGL.STATIC_DRAW);
+
+    WebGL.bindBuffer(WebGL.ARRAY_BUFFER, DrawAxisLineXVertexBuffer);
+    WebGL.vertexAttribPointer(position, 3, WebGL.FLOAT, false, 0, 0);
+    WebGL.enableVertexAttribArray(position);
+
+    WebGL.bindBuffer(WebGL.ARRAY_BUFFER, DrawAxisLineXColorBuffer);
+    WebGL.vertexAttribPointer(color, 3, WebGL.FLOAT, false, 0, 0);
+    WebGL.enableVertexAttribArray(color);
+
+    WebGL.disableVertexAttribArray(uv);
+
+    WebGL.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, null);
+
+    WebGL.drawArrays(WebGL.LINES, 0, 2);
+}
+
+function DrawAxisLineZ(Color) {
+    let LineColor = HexToGLColor(Color);
+    DrawAxisLineZColors = new Float32Array ([
+        LineColor[0], LineColor[1], LineColor[2],
+        LineColor[0], LineColor[1], LineColor[2]
+    ]);
+
+    WebGL.bindBuffer(WebGL.ARRAY_BUFFER, DrawAxisLineZColorBuffer);
+    WebGL.bufferData(WebGL.ARRAY_BUFFER, DrawAxisLineZColors, WebGL.STATIC_DRAW);
+
+    WebGL.bindBuffer(WebGL.ARRAY_BUFFER, DrawAxisLineZVertexBuffer);
+    WebGL.vertexAttribPointer(position, 3, WebGL.FLOAT, false, 0, 0);
+    WebGL.enableVertexAttribArray(position);
+
+    WebGL.bindBuffer(WebGL.ARRAY_BUFFER, DrawAxisLineZColorBuffer);
+    WebGL.vertexAttribPointer(color, 3, WebGL.FLOAT, false, 0, 0);
+    WebGL.enableVertexAttribArray(color);
+
+    WebGL.disableVertexAttribArray(uv);
+
+    WebGL.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, null);
+
+    WebGL.drawArrays(WebGL.LINES, 0, 2);
+}
 
 WebGL.clearColor(0.0, 0.0, 0.0, 1.0);
 
@@ -300,23 +431,42 @@ function updateCameraMovement(){
     r = normalize(r);
 
     if (MapTabEnabled == true) {
-        if(keys["w"]){
-            Camera.Position.X += f[0] * Camera.Settings.Speed;
-            Camera.Position.Y += f[1] * Camera.Settings.Speed;
-            Camera.Position.Z += f[2] * Camera.Settings.Speed;
-        }
-        if(keys["s"]){
-            Camera.Position.X -= f[0] * Camera.Settings.Speed;
-            Camera.Position.Y -= f[1] * Camera.Settings.Speed;
-            Camera.Position.Z -= f[2] * Camera.Settings.Speed;
-        }
-        if(keys["a"]){
-            Camera.Position.X -= r[0] * Camera.Settings.Speed;
-            Camera.Position.Z -= r[2] * Camera.Settings.Speed;
-        }
-        if(keys["d"]){
-            Camera.Position.X += r[0] * Camera.Settings.Speed;
-            Camera.Position.Z += r[2] * Camera.Settings.Speed;
+        if (Camera.Settings.FreeCam) {
+            if(keys["w"]){
+                Camera.Position.X += f[0] * Camera.Settings.Speed;
+                Camera.Position.Y += f[1] * Camera.Settings.Speed;
+                Camera.Position.Z += f[2] * Camera.Settings.Speed;
+            }
+            if(keys["s"]){
+                Camera.Position.X -= f[0] * Camera.Settings.Speed;
+                Camera.Position.Y -= f[1] * Camera.Settings.Speed;
+                Camera.Position.Z -= f[2] * Camera.Settings.Speed;
+            }
+            if(keys["a"]){
+                Camera.Position.X -= r[0] * Camera.Settings.Speed;
+                Camera.Position.Z -= r[2] * Camera.Settings.Speed;
+            }
+            if(keys["d"]){
+                Camera.Position.X += r[0] * Camera.Settings.Speed;
+                Camera.Position.Z += r[2] * Camera.Settings.Speed;
+            }
+        } else {
+            if(keys["w"]){
+                Camera.Position.X += f[0] * Camera.Settings.Speed;
+                Camera.Position.Z += f[2] * Camera.Settings.Speed;
+            }
+            if(keys["s"]){
+                Camera.Position.X -= f[0] * Camera.Settings.Speed;
+                Camera.Position.Z -= f[2] * Camera.Settings.Speed;
+            }
+            if(keys["a"]){
+                Camera.Position.X -= r[0] * Camera.Settings.Speed;
+                Camera.Position.Z -= r[2] * Camera.Settings.Speed;
+            }
+            if(keys["d"]){
+                Camera.Position.X += r[0] * Camera.Settings.Speed;
+                Camera.Position.Z += r[2] * Camera.Settings.Speed;
+            }
         }
     }
 }
@@ -405,8 +555,7 @@ function resizeAll() {
     canvas.style.width = width + "px";
     canvas.style.height = height + "px";
 
-    // WebGL
-    // gl.viewport(0, 0, width, height);
+    WebGL.viewport(0, 0, canvas.width, canvas.height);
 }
 
 document.addEventListener("fullscreenchange", resizeAll);
@@ -452,6 +601,30 @@ var Z_RotAngleRadians = degreesToRadians(Z_RotAngleDegrees);
 let ObjectRotationX;
 let ObjectRotationY;
 let ObjectRotationZ;
+
+const texture = WebGL.createTexture();
+const image = new Image();
+image.src = "texture.png";
+
+image.onload = () => {
+    WebGL.bindTexture(WebGL.TEXTURE_2D, texture);
+    WebGL.texImage2D(
+        WebGL.TEXTURE_2D,
+        0,
+        WebGL.RGBA,
+        WebGL.RGBA,
+        WebGL.UNSIGNED_BYTE,
+        image
+    );
+
+    WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_WRAP_S, WebGL.CLAMP_TO_EDGE);
+    WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_WRAP_T, WebGL.CLAMP_TO_EDGE);
+    
+    WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_MIN_FILTER, WebGL.NEAREST);
+    WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_MAG_FILTER, WebGL.NEAREST);
+
+    WebGL.bindTexture(WebGL.TEXTURE_2D, null);
+};
 
 function animate(){
     updateCameraMovement();
@@ -538,8 +711,25 @@ function animate(){
     WebGL.uniformMatrix4fv(Vmatrix, false, view_matrix);
     WebGL.uniformMatrix4fv(Mmatrix, false, mov_matrix);
 
-    WebGL.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, index_buffer);
-    WebGL.drawElements(WebGL.TRIANGLES,indices.length, WebGL.UNSIGNED_SHORT, 0);
+    if (HaveTexture) {
+        WebGL.activeTexture(WebGL.TEXTURE0);
+        WebGL.bindTexture(WebGL.TEXTURE_2D, texture);
+        WebGL.uniform1i(textureLoc, 0);
+        WebGL.uniform1i(haveTextureLoc, 1);
+    } else {
+        WebGL.uniform1i(haveTextureLoc, 0);
+    }
+
+    WebGL.activeTexture(WebGL.TEXTURE0);
+    WebGL.bindTexture(WebGL.TEXTURE_2D, texture);
+
+    if (States.Debug.Run == true) {
+        drawCube();
+    } else {
+        drawCube();
+        DrawAxisLineX("#FF0000FF")
+        DrawAxisLineZ("#0000FFFF");
+    }
 
     requestAnimationFrame(animate);
 }

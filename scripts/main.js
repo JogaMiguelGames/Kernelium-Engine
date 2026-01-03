@@ -25,6 +25,9 @@ let elements = {
                         },
                         rotation: {
 
+                        },
+                        modes: {
+                            freecam: document.getElementById("inspector_settings_tab-camera-settings-freecam-input")
                         }
                     }
                 },
@@ -45,23 +48,6 @@ let States = {
     }
 }
 
-var Camera = {
-    Position: {
-        X: 0,
-        Y: 0,
-        Z: 6
-    },
-    Rotation: {
-        X: 0, // Pitch
-        Y: 0, // Yaw
-        Z: 0 // Roll
-    },
-    Settings: {
-        Speed: 0.15,
-        Sensitivity: 0.002
-    }
-};
-
 var LastCamera = {
     Position: {
         X: 0,
@@ -80,6 +66,10 @@ var LastCamera = {
 };
 
 StopButton.style.border = "2px solid #FF0000";
+
+const Console = CreateWindow("Console", 100, 100, 800, 600, "#555555");
+
+Console.add("cmd_input");
 
 function RunProject() {
     States.Debug.Run = true;
@@ -110,6 +100,23 @@ function RunProject() {
 
     Camera.Settings.Speed = 0.15;
     Camera.Settings.Sensitivity = 0.002;
+
+    if (elements.inspector.tabs.settings.camera.inputs.modes.freecam.checked) {
+        Camera.Settings.FreeCam = true;
+    } else {
+        Camera.Settings.FreeCam = false;
+    }
+
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "'") {
+            ConsoleEnabled = !ConsoleEnabled; 
+        }
+        if (ConsoleEnabled == true) {
+            Console.show();
+        } else {
+            Console.hide();
+        }
+    });
 }
 
 function PauseProject() {
@@ -120,6 +127,8 @@ function PauseProject() {
 
 function StopProject() {
     States.Debug.Run = false;
+
+    Camera.Settings.FreeCam = true;
 
     RunButton.style.border = "0px solid #00FF00";
     PauseButton.style.border = "0px solid #FFFF00";

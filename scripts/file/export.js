@@ -83,6 +83,255 @@ function Export() {
     </div>
 
     <script>
+        var Camera = {
+            Position: {
+                X: 0,
+                Y: 0,
+                Z: 6
+            },
+            Rotation: {
+                X: 0, // Pitch
+                Y: 0, // Yaw
+                Z: 0 // Roll
+            },
+            Settings: {
+                Speed: 0.15,
+                Sensitivity: 0.002,
+
+                FreeCam: true
+            }
+        };
+
+        let MapTabEnabled = true;
+        let ConsoleEnabled = false;
+
+        function CreateWindow(WindowTitle, PositionX, PositionY, SizeX, SizeY, BackgroundColor) {
+            const Window = document.createElement("div");
+
+            // TopBar
+
+            const TopBar        =   document.createElement("div");
+
+            const Title         =   document.createElement("h1");
+
+            const CloseButton   =   document.createElement("button");
+
+            // Window Style
+
+            Window.style.backgroundColor = BackgroundColor;
+
+            Window.style.display = "none";
+
+            Window.style.border = "2px solid #000000";
+            Window.style.borderRadius = "10px";
+
+            Window.style.position  =    "relative";
+
+            Window.style.zIndex    =    1500;
+
+            Window.style.top       =    PositionY + "px";
+            Window.style.left      =    PositionX + "px";
+
+            Window.style.width     =    SizeX     + "px";
+            Window.style.height    =    SizeY     + "px";
+
+            // Top Bar
+
+            TopBar.style.position                =  "relative";
+
+            TopBar.style.backgroundColor         =  "#444444";
+
+            TopBar.style.width                   =  "100%";
+            TopBar.style.height                   =  "6.5%";
+
+            TopBar.style.borderBottom            = "2px solid #000000";
+
+            TopBar.style.borderTopLeftRadius     = "6px";
+            TopBar.style.borderTopRightRadius    = "6px";
+
+            // TopBar Title
+
+            Title.textContent                    = WindowTitle;
+
+            Title.style.position                 = "absolute";
+            Title.style.margin                   =  0;
+
+            // TopBar Close Button
+
+            CloseButton.textContent              =  "X";
+
+            CloseButton.style.position           = "absolute";
+
+            CloseButton.style.background         = "linear-gradient(to bottom, #FF0000, #800000)";
+            CloseButton.style.color              = "#FFFFFF";
+
+            CloseButton.style.right              =  0;
+
+            CloseButton.style.width              =  "40px";
+            CloseButton.style.height             =  "40px";
+
+            CloseButton.style.border             =  "2px solid #000000";
+            CloseButton.style.borderRadius       =  "6px";
+            
+            CloseButton.style.fontSize           =  "30px";
+
+            CloseButton.style.textAlign          =  "center";
+
+            CloseButton.addEventListener('click', (event) => {
+                Window.style.display = "none";
+
+                ConsoleEnabled = false;
+            });
+
+            // Append Childs
+
+            document.body.appendChild(Window);
+            Window.appendChild(TopBar);
+
+            // TopBar Append Child
+
+            TopBar.appendChild(Title);
+            TopBar.appendChild(CloseButton);
+
+            return {
+                element: Window,
+                close() {
+                    Window.remove();
+                    
+                    ConsoleEnabled = false;
+                    MapTabEnabled = true;
+                },
+                show() {
+                    Window.style.display = "flex";
+                    
+                    ConsoleEnabled = true;
+                    MapTabEnabled = false;
+                },
+                hide() {
+                    Window.style.display = "none";
+
+                    ConsoleEnabled = false;
+                    MapTabEnabled = true;
+                },
+                add(Element) {
+                    if (Element == "cmd_input") {
+                        let CMDInput = document.createElement("input");
+                        let CMDLastsCommands = document.createElement("pre");
+
+                        function WriteLine(text) {
+                            CMDLastsCommands.textContent += text + "\\n";
+                        }
+
+                        CMDLastsCommands.style.position = "absolute";
+
+                        CMDLastsCommands.style.backgroundColor = "#777777";
+
+                        CMDLastsCommands.style.top = "100px";
+                        CMDLastsCommands.style.left = "10px";
+
+                        CMDLastsCommands.style.width = "770px";
+                        CMDLastsCommands.style.height = "400px";
+
+                        CMDInput.type = "text";
+
+                        CMDInput.style.position = "absolute";
+
+                        CMDInput.style.backgroundColor = "#444444";
+
+                        CMDInput.style.outline = "none";
+
+                        CMDInput.style.left = "10px";
+                        CMDInput.style.bottom = "10px";
+
+                        CMDInput.style.width = "770px";
+
+                        CMDInput.style.border = "1px solid #000000";
+                        CMDInput.style.borderRadius = "5px";   
+
+                        CMDInput.addEventListener("blur", function () {
+                            CMDInput.style.backgroundColor = "#444444";
+
+                            CMDInput.style.left = "10px";
+                            CMDInput.style.bottom = "10px";
+
+                            CMDInput.style.width = "770px";
+
+                            CMDInput.style.border = "1px solid #000000";
+                            CMDInput.style.borderRadius = "5px";
+                        });
+
+                        CMDInput.addEventListener("focus", function () {
+                            CMDInput.style.backgroundColor = "#555555";
+
+                            CMDInput.style.left = "10px";
+                            CMDInput.style.bottom = "10px";
+
+                            CMDInput.style.width = "770px";
+
+                            CMDInput.style.border = "2px solid #FFFFFF";
+                            CMDInput.style.borderRadius = "5px";
+                        });
+                        
+                        CMDInput.addEventListener('keydown', function(event) {
+                            if (event.key === 'Enter') {
+                                if (CMDInput.value == "freecam_enable true") {
+                                    Camera.Settings.FreeCam = true;
+
+                                    WriteLine("FreeCam Enabled");
+                                    console.log(Camera.Settings.FreeCam)
+                                } else if (CMDInput.value == "freecam_enable false") {
+                                    Camera.Settings.FreeCam = false;
+
+                                    WriteLine("FreeCam Disabled");
+                                    console.log(Camera.Settings.FreeCam)
+                                }
+                            }
+                        });
+
+                        Window.appendChild(CMDLastsCommands);
+                        Window.appendChild(CMDInput);
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script>
+        var Camera = {
+            Position: {
+                X: 0,
+                Y: 0,
+                Z: 6
+            },
+            Rotation: {
+                X: 0, // Pitch
+                Y: 0, // Yaw
+                Z: 0 // Roll
+            },
+            Settings: {
+                Speed: 0.15,
+                Sensitivity: 0.002,
+
+                FreeCam: true
+            }
+        };
+
+        const Console = CreateWindow("Console", 100, 100, 800, 600, "#555555");
+        Console.add("cmd_input");
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "'") {
+                ConsoleEnabled = !ConsoleEnabled; 
+            }
+            if (ConsoleEnabled == true) {
+                Console.show();
+            } else {
+                Console.hide();
+            }
+        });
+    </script>
+
+    <script>
         const HealthDiv = document.getElementById("main-view_health");
 
         const HealthTitle = document.getElementById("main-view_health-title");
@@ -123,8 +372,9 @@ function Export() {
     </script>
 
     <script>
-        var canvas = document.getElementById('gl_main-canvas');
-        var WebGL = canvas.getContext('experimental-webgl');
+        var canvas =  document.getElementById('gl_main-canvas');
+
+        var WebGL  =  canvas.getContext('webgl') || canvas.getContext("webgl-experimental");
 
         var vertices = [
             -1, -1, -1,   1, -1, -1,   1,  1, -1,  -1,  1, -1,
@@ -145,16 +395,6 @@ function Export() {
             16,17,18, 16,18,19,
             20,21,22, 20,22,23
         ];
-
-        var Camera = {
-            x: ${elements.inspector.tabs.settings.camera.inputs.position.x.value},
-            y: ${elements.inspector.tabs.settings.camera.inputs.position.y.value},
-            z: ${elements.inspector.tabs.settings.camera.inputs.position.z.value},
-            yaw: 0,
-            pitch: 0,
-            speed: 0.15,
-            sensitivity: 0.002
-        };
 
         var color_buffer = WebGL.createBuffer();
         WebGL.bindBuffer(WebGL.ARRAY_BUFFER, color_buffer);
@@ -260,6 +500,7 @@ function Export() {
 
         function normalize(v){
             var l = Math.hypot(v[0], v[1], v[2]);
+            if (l === 0) return [0,0,0];
             return [v[0]/l, v[1]/l, v[2]/l];
         }
 
@@ -277,9 +518,9 @@ function Export() {
 
         function getCameraForward(){
             return normalize([
-                Math.cos(Camera.pitch) * Math.sin(Camera.yaw),
-                Math.sin(Camera.pitch),
-            -Math.cos(Camera.pitch) * Math.cos(Camera.yaw)
+                Math.cos(Camera.Rotation.X) * Math.sin(Camera.Rotation.Y),
+                Math.sin(Camera.Rotation.X),
+            -Math.cos(Camera.Rotation.X) * Math.cos(Camera.Rotation.Y)
             ]);
         }
 
@@ -290,23 +531,44 @@ function Export() {
             var f = getCameraForward();
             var r = normalize(cross(f, [0,1,0]));
 
-            if(keys["w"]){
-                Camera.x += f[0] * Camera.speed;
-                Camera.y += f[1] * Camera.speed;
-                Camera.z += f[2] * Camera.speed;
-            }
-            if(keys["s"]){
-                Camera.x -= f[0] * Camera.speed;
-                Camera.y -= f[1] * Camera.speed;
-                Camera.z -= f[2] * Camera.speed;
-            }
-            if(keys["a"]){
-                Camera.x -= r[0] * Camera.speed;
-                Camera.z -= r[2] * Camera.speed;
-            }
-            if(keys["d"]){
-                Camera.x += r[0] * Camera.speed;
-                Camera.z += r[2] * Camera.speed;
+            if (MapTabEnabled == true) {
+                if (Camera.Settings.FreeCam) {
+                    if(keys["w"]){
+                        Camera.Position.X += f[0] * Camera.Settings.Speed;
+                        Camera.Position.Y += f[1] * Camera.Settings.Speed;
+                        Camera.Position.Z += f[2] * Camera.Settings.Speed;
+                    }
+                    if(keys["s"]){
+                        Camera.Position.X -= f[0] * Camera.Settings.Speed;
+                        Camera.Position.Y -= f[1] * Camera.Settings.Speed;
+                        Camera.Position.Z -= f[2] * Camera.Settings.Speed;
+                    }
+                    if(keys["a"]){
+                        Camera.Position.X -= r[0] * Camera.Settings.Speed;
+                        Camera.Position.Z -= r[2] * Camera.Settings.Speed;
+                    }
+                    if(keys["d"]){
+                        Camera.Position.X += r[0] * Camera.Settings.Speed;
+                        Camera.Position.Z += r[2] * Camera.Settings.Speed;
+                    }
+                } else {
+                    if(keys["w"]){
+                        Camera.Position.X += f[0] * Camera.Settings.Speed;
+                        Camera.Position.Z += f[2] * Camera.Settings.Speed;
+                    }
+                    if(keys["s"]){
+                        Camera.Position.X -= f[0] * Camera.Settings.Speed;
+                        Camera.Position.Z -= f[2] * Camera.Settings.Speed;
+                    }
+                    if(keys["a"]){
+                        Camera.Position.X -= r[0] * Camera.Settings.Speed;
+                        Camera.Position.Z -= r[2] * Camera.Settings.Speed;
+                    }
+                    if(keys["d"]){
+                        Camera.Position.X += r[0] * Camera.Settings.Speed;
+                        Camera.Position.Z += r[2] * Camera.Settings.Speed;
+                    }
+                }
             }
         }
 
@@ -321,9 +583,9 @@ function Export() {
                 right[0],  up[0],  -forward[0],  0,
                 right[1],  up[1],  -forward[1],  0,
                 right[2],  up[2],  -forward[2],  0,
-                -dot(right, [Camera.x, Camera.y, Camera.z]),
-                -dot(up,    [Camera.x, Camera.y, Camera.z]),
-                dot(forward,[Camera.x, Camera.y, Camera.z]),
+                -dot(right, [Camera.Position.X, Camera.Position.Y, Camera.Position.Z]),
+                -dot(up,    [Camera.Position.X, Camera.Position.Y, Camera.Position.Z]),
+                dot(forward,[Camera.Position.X, Camera.Position.Y, Camera.Position.Z]),
                 1
             ];
         }
@@ -337,12 +599,12 @@ function Export() {
         document.addEventListener("mousemove", e=>{
             if(document.pointerLockElement !== canvas) return;
 
-            Camera.yaw   += e.movementX * Camera.sensitivity;
-            Camera.pitch -= e.movementY * Camera.sensitivity;
+            Camera.Rotation.Y   += e.movementX * Camera.Settings.Sensitivity;
+            Camera.Rotation.X -= e.movementY * Camera.Settings.Sensitivity;
 
             var limit = Math.PI/2 - 0.01;
-            if(Camera.pitch > limit) Camera.pitch = limit;
-            if(Camera.pitch < -limit) Camera.pitch = -limit;
+            if(Camera.Rotation.X > limit) Camera.Rotation.X = limit;
+            if(Camera.Rotation.X < -limit) Camera.Rotation.X = -limit;
         });
 
         let AnimationRotateNodeX = ${RotationNodeXInput.value};
