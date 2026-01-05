@@ -7,7 +7,7 @@ const Project = {
         Title: "Kernelium Engine",
         Language: "en"
     }
-}
+};
 
 let elements = {
     inspector: {
@@ -39,14 +39,14 @@ let elements = {
             }
         }
     }
-}
+};
 
 let States = {
     Debug: {
         DevMode: false,
         Run: false
     }
-}
+};
 
 var LastCamera = {
     Position: {

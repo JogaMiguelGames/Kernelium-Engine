@@ -719,7 +719,7 @@ function animate(){
 
         WebGL.uniform1i(haveTextureLoc, 0);
 
-        DrawAxisLineX("#FF0000FF")
+        DrawAxisLineX("#FF0000FF");
         DrawAxisLineZ("#0000FFFF");
 
         WebGL.uniform1i(haveTextureLoc, HaveTexture ? 1 : 0);
