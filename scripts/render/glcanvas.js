@@ -8,7 +8,7 @@ if (!WebGL) {
     alert("WebGL is not supported on this browser or device!");
 }
 
-var HaveTexture = true;
+var HaveTexture = false;
 
 var ColorNames = {
     Red: [
@@ -93,11 +93,12 @@ var OBJColor = ColorNames.White;
 const BackgroundColorInput = document.getElementById("Background-Color-Input");
 const OBJColorInput        = document.getElementById("OBJ-Color-Input");
 
+const OBJTextureInput      = elements.inspector.tabs.obj.inputs.texture;
+const OBJTextureFilteringInput  = elements.inspector.tabs.obj.inputs.textureFiltering;
+
 const ObjRotInputX         = document.getElementById("inspector_obj-rot-x");
 const ObjRotInputY         = document.getElementById("inspector_obj-rot-y");
 const ObjRotInputZ         = document.getElementById("inspector_obj-rot-z");
-
-
 
 let BackgroundColor = HexToGLColor(BackgroundColorInput.value);
 let OBJ_Color       = HexToGLColor(OBJColorInput.value);
@@ -121,7 +122,7 @@ WebGL.bufferData(
 
 var index_buffer = WebGL.createBuffer();
 WebGL.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, index_buffer);
-WebGL.bufferData(WebGL.ELEMENT_ARRAY_BUFFER, new Uint16Array(Props.Door.Faces), WebGL.STATIC_DRAW);
+WebGL.bufferData(WebGL.ELEMENT_ARRAY_BUFFER, new Uint16Array(Objects.Cube.Indices), WebGL.STATIC_DRAW);
 
 var vertCode =
     'attribute vec3 position;' +
@@ -256,23 +257,31 @@ BackgroundColorInput.addEventListener('keydown', function(event) {
     }
 });
 
+OBJTextureInput.addEventListener("change", (event) => {
+    if (OBJTextureInput.checked) {
+        HaveTexture = true;
+    } else {
+        HaveTexture = false;
+    }
+});
+
 var vertex_buffer = WebGL.createBuffer();
 WebGL.bindBuffer(WebGL.ARRAY_BUFFER, vertex_buffer);
 
-WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Props.Door.Vertices), WebGL.STATIC_DRAW);
-
-var color = WebGL.getAttribLocation(shaderProgram, "color");
-var uv    = WebGL.getAttribLocation(shaderProgram, "uv");
-
-var uv_buffer = WebGL.createBuffer();
-WebGL.bindBuffer(WebGL.ARRAY_BUFFER, uv_buffer);
-WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Props.Door.UV), WebGL.STATIC_DRAW);
-
-var position = WebGL.getAttribLocation(shaderProgram,"position");
-
-var color = WebGL.getAttribLocation(shaderProgram,"color");
+WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Objects.Cube.Vertices), WebGL.STATIC_DRAW);
 
 function drawCube() {
+    var color = WebGL.getAttribLocation(shaderProgram, "color");
+    var uv    = WebGL.getAttribLocation(shaderProgram, "uv");
+
+    var uv_buffer = WebGL.createBuffer();
+    WebGL.bindBuffer(WebGL.ARRAY_BUFFER, uv_buffer);
+    WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Objects.Cube.UV), WebGL.STATIC_DRAW);
+
+    var position = WebGL.getAttribLocation(shaderProgram,"position");
+
+    var color = WebGL.getAttribLocation(shaderProgram,"color");
+
     WebGL.bindBuffer(WebGL.ARRAY_BUFFER, vertex_buffer);
     WebGL.vertexAttribPointer(position, 3, WebGL.FLOAT, false, 0, 0);
     WebGL.enableVertexAttribArray(position);
@@ -287,7 +296,7 @@ function drawCube() {
 
     WebGL.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, index_buffer);
 
-    WebGL.drawElements(WebGL.TRIANGLES, Props.Door.Faces.length, WebGL.UNSIGNED_SHORT, 0);
+    WebGL.drawElements(WebGL.TRIANGLES, Objects.Cube.Indices.length, WebGL.UNSIGNED_SHORT, 0);
 }
 
 const DrawAxisLineXVertexBuffer = WebGL.createBuffer();
@@ -317,7 +326,19 @@ WebGL.bindBuffer(WebGL.ARRAY_BUFFER, DrawAxisLineZColorBuffer);
 WebGL.bufferData(WebGL.ARRAY_BUFFER, DrawAxisLineZColors, WebGL.STATIC_DRAW);
 
 function DrawAxisLineX(Color) {
+    var color = WebGL.getAttribLocation(shaderProgram, "color");
+    var uv    = WebGL.getAttribLocation(shaderProgram, "uv");
+
+    var uv_buffer = WebGL.createBuffer();
+    WebGL.bindBuffer(WebGL.ARRAY_BUFFER, uv_buffer);
+    WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Objects.Cube.UV), WebGL.STATIC_DRAW);
+
+    var position = WebGL.getAttribLocation(shaderProgram,"position");
+
+    var color = WebGL.getAttribLocation(shaderProgram,"color");
+
     let LineColor = HexToGLColor(Color);
+
     DrawAxisLineXColors = new Float32Array ([
         LineColor[0], LineColor[1], LineColor[2],
         LineColor[0], LineColor[1], LineColor[2]
@@ -342,7 +363,19 @@ function DrawAxisLineX(Color) {
 }
 
 function DrawAxisLineZ(Color) {
+    var color = WebGL.getAttribLocation(shaderProgram, "color");
+    var uv    = WebGL.getAttribLocation(shaderProgram, "uv");
+
+    var uv_buffer = WebGL.createBuffer();
+    WebGL.bindBuffer(WebGL.ARRAY_BUFFER, uv_buffer);
+    WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Objects.Cube.UV), WebGL.STATIC_DRAW);
+
+    var position = WebGL.getAttribLocation(shaderProgram,"position");
+
+    var color = WebGL.getAttribLocation(shaderProgram,"color");
+
     let LineColor = HexToGLColor(Color);
+    
     DrawAxisLineZColors = new Float32Array ([
         LineColor[0], LineColor[1], LineColor[2],
         LineColor[0], LineColor[1], LineColor[2]
@@ -588,8 +621,49 @@ let ObjectRotationY;
 let ObjectRotationZ;
 
 const texture = WebGL.createTexture();
-const image = new Image();
-image.src = "LeftDoorTexture.png";
+let image = new Image();
+
+image.src = "resources/sprites/objects/cube/none.png";
+
+image.onload = function () {
+    WebGL.bindTexture(WebGL.TEXTURE_2D, texture);
+    WebGL.texImage2D(
+        WebGL.TEXTURE_2D,
+        0,
+        WebGL.RGBA,
+        WebGL.RGBA,
+        WebGL.UNSIGNED_BYTE,
+        image
+    );
+    WebGL.generateMipmap(WebGL.TEXTURE_2D);
+};
+
+document.getElementById("OBJ_Texture-File_Input").addEventListener("change", function (event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = function (e) {
+        image = new Image();
+        image.src = e.target.result;
+
+        image.onload = function () {
+            WebGL.bindTexture(WebGL.TEXTURE_2D, texture);
+            WebGL.texImage2D(
+                WebGL.TEXTURE_2D,
+                0,
+                WebGL.RGBA,
+                WebGL.RGBA,
+                WebGL.UNSIGNED_BYTE,
+                image
+            );
+            WebGL.generateMipmap(WebGL.TEXTURE_2D);
+        };
+    };
+
+    reader.readAsDataURL(file);
+});
 
 image.onload = () => {
     WebGL.bindTexture(WebGL.TEXTURE_2D, texture);
@@ -604,9 +678,19 @@ image.onload = () => {
 
     WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_WRAP_S, WebGL.CLAMP_TO_EDGE);
     WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_WRAP_T, WebGL.CLAMP_TO_EDGE);
-    
-    WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_MIN_FILTER, WebGL.LINEAR);
-    WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_MAG_FILTER, WebGL.LINEAR);
+
+    WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_MIN_FILTER, WebGL.NEAREST);
+    WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_MAG_FILTER, WebGL.NEAREST);
+
+    OBJTextureFilteringInput.addEventListener('change', (event) => {
+        if (OBJTextureFilteringInput.checked == true) {
+            WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_MIN_FILTER, WebGL.LINEAR);
+            WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_MAG_FILTER, WebGL.LINEAR);
+        } else {
+            WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_MIN_FILTER, WebGL.NEAREST);
+            WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_MAG_FILTER, WebGL.NEAREST);
+        }
+    });
 
     WebGL.bindTexture(WebGL.TEXTURE_2D, null);
 };
@@ -692,7 +776,7 @@ function animate(){
 
     WebGL.bindBuffer(WebGL.ARRAY_BUFFER, vertex_buffer);
 
-    WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Props.Door.Vertices), WebGL.STATIC_DRAW);
+    WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Objects.Cube.Vertices), WebGL.STATIC_DRAW);
     
     WebGL.clear(WebGL.COLOR_BUFFER_BIT | WebGL.DEPTH_BUFFER_BIT);
 

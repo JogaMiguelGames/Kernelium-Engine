@@ -1,12 +1,12 @@
 var Camera = {
     Position: {
-        X: 0,
-        Y: 0,
-        Z: 6
+        X:  4,
+        Y:  5,
+        Z: -4
     },
     Rotation: {
-        X: 0, // Pitch
-        Y: 0, // Yaw
+        X: -0.632, // Pitch
+        Y: -2.350, // Yaw
         Z: 0 // Roll
     },
     Settings: {
@@ -19,6 +19,18 @@ var Camera = {
 
 let MapTabEnabled = true;
 let ConsoleEnabled = false;
+
+let CDROTX = -45;
+let CDROTY = -135;
+let CDROTZ = 0;
+
+let CRROTX = CDROTX * Math.PI / 180
+let CRROTY = CDROTY * Math.PI / 180
+let CRROTZ = CDROTZ * Math.PI / 180
+
+Camera.Rotation.X = CRROTX;
+Camera.Rotation.Y = CRROTY;
+Camera.Rotation.Z = CRROTZ;
 
 function CreateWindow(WindowTitle, PositionX, PositionY, SizeX, SizeY, BackgroundColor) {
     const Window = document.createElement("div");

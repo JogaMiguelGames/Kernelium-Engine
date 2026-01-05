@@ -1,3 +1,8 @@
+// === Web Kernelium Engine ===
+//       == Main Script ==     
+//                             
+//           /main.js          
+
 const RunButton = document.getElementById("Run-Button");
 const PauseButton = document.getElementById("Pause-Button");
 const StopButton = document.getElementById("Stop-Button");
@@ -13,7 +18,10 @@ let elements = {
     inspector: {
         tabs: {
             obj: {
-
+                inputs: {
+                    texture:          document.getElementById("OBJ_Texture-Input"),
+                    textureFiltering: document.getElementById("OBJ_Texture-Filtering_Input")
+                }
             },
             settings: {
                 camera: {

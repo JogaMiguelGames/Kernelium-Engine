@@ -1,3 +1,8 @@
+//  === Web Kernelium Engine ===
+//  == Kernelium Script Code == 
+//                              
+//     /tab/script/script.js    
+
 const Map_Tab = document.getElementById("map-tab");
 const Script_Cell = document.getElementById("script-tab");
 
