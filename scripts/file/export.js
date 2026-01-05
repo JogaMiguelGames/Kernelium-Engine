@@ -618,6 +618,10 @@ function Export() {
             0,0,0,1
         ];
 
+        WebGL.enable(WebGL.CULL_FACE);
+        WebGL.cullFace(WebGL.BACK);
+        WebGL.frontFace(WebGL.CCW);
+
         function animate(){
             updateCameraMovement();
 

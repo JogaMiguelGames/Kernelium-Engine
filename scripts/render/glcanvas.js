@@ -8,7 +8,7 @@ if (!WebGL) {
     alert("WebGL is not supported on this browser or device!");
 }
 
-var HaveTexture = false;
+var HaveTexture = true;
 
 var ColorNames = {
     Red: [
@@ -97,24 +97,7 @@ const ObjRotInputX         = document.getElementById("inspector_obj-rot-x");
 const ObjRotInputY         = document.getElementById("inspector_obj-rot-y");
 const ObjRotInputZ         = document.getElementById("inspector_obj-rot-z");
 
-var indices = [
-     0,1,2, 0,2,3,
-     4,5,6, 4,6,7,
-     8,9,10, 8,10,11,
-    12,13,14, 12,14,15,
-    16,17,18, 16,18,19,
-    20,21,22, 20,22,23
-];
 
-const DrawAxisLineXVertices = new Float32Array([
-     100, 0, 0,
-    -100, 0, 0
-]);
-
-const DrawAxisLineZVertices = new Float32Array([
-     0,  0,  100,
-     0,  0, -100
-]);
 
 let BackgroundColor = HexToGLColor(BackgroundColorInput.value);
 let OBJ_Color       = HexToGLColor(OBJColorInput.value);
@@ -138,7 +121,7 @@ WebGL.bufferData(
 
 var index_buffer = WebGL.createBuffer();
 WebGL.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, index_buffer);
-WebGL.bufferData(WebGL.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), WebGL.STATIC_DRAW);
+WebGL.bufferData(WebGL.ELEMENT_ARRAY_BUFFER, new Uint16Array(Props.Door.Faces), WebGL.STATIC_DRAW);
 
 var vertCode =
     'attribute vec3 position;' +
@@ -276,14 +259,14 @@ BackgroundColorInput.addEventListener('keydown', function(event) {
 var vertex_buffer = WebGL.createBuffer();
 WebGL.bindBuffer(WebGL.ARRAY_BUFFER, vertex_buffer);
 
-WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Objects.Cube.Vertices), WebGL.STATIC_DRAW);
+WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Props.Door.Vertices), WebGL.STATIC_DRAW);
 
 var color = WebGL.getAttribLocation(shaderProgram, "color");
 var uv    = WebGL.getAttribLocation(shaderProgram, "uv");
 
 var uv_buffer = WebGL.createBuffer();
 WebGL.bindBuffer(WebGL.ARRAY_BUFFER, uv_buffer);
-WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Objects.Cube.UV), WebGL.STATIC_DRAW);
+WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Props.Door.UV), WebGL.STATIC_DRAW);
 
 var position = WebGL.getAttribLocation(shaderProgram,"position");
 
@@ -304,16 +287,16 @@ function drawCube() {
 
     WebGL.bindBuffer(WebGL.ELEMENT_ARRAY_BUFFER, index_buffer);
 
-    WebGL.drawElements(WebGL.TRIANGLES, indices.length, WebGL.UNSIGNED_SHORT, 0);
+    WebGL.drawElements(WebGL.TRIANGLES, Props.Door.Faces.length, WebGL.UNSIGNED_SHORT, 0);
 }
 
 const DrawAxisLineXVertexBuffer = WebGL.createBuffer();
 WebGL.bindBuffer(WebGL.ARRAY_BUFFER, DrawAxisLineXVertexBuffer);
-WebGL.bufferData(WebGL.ARRAY_BUFFER, DrawAxisLineXVertices, WebGL.STATIC_DRAW);
+WebGL.bufferData(WebGL.ARRAY_BUFFER, Axis.Lines.X.Vertices, WebGL.STATIC_DRAW);
 
 const DrawAxisLineZVertexBuffer = WebGL.createBuffer();
 WebGL.bindBuffer(WebGL.ARRAY_BUFFER, DrawAxisLineZVertexBuffer);
-WebGL.bufferData(WebGL.ARRAY_BUFFER, DrawAxisLineZVertices, WebGL.STATIC_DRAW);
+WebGL.bufferData(WebGL.ARRAY_BUFFER, Axis.Lines.Z.Vertices, WebGL.STATIC_DRAW);
 
 let DrawAxisLineXColors = new Float32Array([
     1.0, 0.0, 0.0,
@@ -506,6 +489,8 @@ document.addEventListener("mousemove", e=>{
     if(Camera.Rotation.X < -limit) Camera.Rotation.X = -limit;
 });
 
+
+
 let AnimationRotateNodeX = RotationNodeXInput.value;
 let AnimationRotateNodeY = RotationNodeYInput.value;
 let AnimationRotateNodeZ = RotationNodeZInput.value;
@@ -604,7 +589,7 @@ let ObjectRotationZ;
 
 const texture = WebGL.createTexture();
 const image = new Image();
-image.src = "texture.png";
+image.src = "LeftDoorTexture.png";
 
 image.onload = () => {
     WebGL.bindTexture(WebGL.TEXTURE_2D, texture);
@@ -620,11 +605,15 @@ image.onload = () => {
     WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_WRAP_S, WebGL.CLAMP_TO_EDGE);
     WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_WRAP_T, WebGL.CLAMP_TO_EDGE);
     
-    WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_MIN_FILTER, WebGL.NEAREST);
-    WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_MAG_FILTER, WebGL.NEAREST);
+    WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_MIN_FILTER, WebGL.LINEAR);
+    WebGL.texParameteri(WebGL.TEXTURE_2D, WebGL.TEXTURE_MAG_FILTER, WebGL.LINEAR);
 
     WebGL.bindTexture(WebGL.TEXTURE_2D, null);
 };
+
+WebGL.enable(WebGL.CULL_FACE);
+WebGL.cullFace(WebGL.BACK);
+WebGL.frontFace(WebGL.CCW);
 
 function animate(){
     updateCameraMovement();
@@ -703,7 +692,7 @@ function animate(){
 
     WebGL.bindBuffer(WebGL.ARRAY_BUFFER, vertex_buffer);
 
-    WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Objects.Cube.Vertices), WebGL.STATIC_DRAW);
+    WebGL.bufferData(WebGL.ARRAY_BUFFER, new Float32Array(Props.Door.Vertices), WebGL.STATIC_DRAW);
     
     WebGL.clear(WebGL.COLOR_BUFFER_BIT | WebGL.DEPTH_BUFFER_BIT);
 
@@ -727,8 +716,13 @@ function animate(){
         drawCube();
     } else {
         drawCube();
+
+        WebGL.uniform1i(haveTextureLoc, 0);
+
         DrawAxisLineX("#FF0000FF")
         DrawAxisLineZ("#0000FFFF");
+
+        WebGL.uniform1i(haveTextureLoc, HaveTexture ? 1 : 0);
     }
 
     requestAnimationFrame(animate);
